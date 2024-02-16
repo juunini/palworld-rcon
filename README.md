@@ -1,10 +1,10 @@
-# <center>Palworld RCON</center>
+# <div align="center">Palworld RCON</div>
 
-<center>
+<div align="center">
     <img src="https://github.com/juunini/palworld-rcon/assets/41536271/8414cd69-68f4-45bc-a052-9c4afa652582" alt="Palworld Icon" />
-</center>
+</div>
 
-<center>
+<div align="center">
     <img src="https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white" alt="Go" />
     <a href="https://goreportcard.com/report/github.com/juunini/palworld-rcon" target="_blank">
         <img src="https://goreportcard.com/badge/github.com/juunini/palworld-rcon" alt="Go Report Card" />
@@ -12,7 +12,7 @@
     <a href="https://godoc.org/github.com/juunini/palworld-rcon" target="_blank">
         <img src="https://img.shields.io/badge/godoc-reference-blue.svg" alt="Go Report Card" />
     </a>
-</center>
+</div>
 
 ## Install
 
