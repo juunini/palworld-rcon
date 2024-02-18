@@ -2,7 +2,6 @@ package palworldrcon
 
 import (
 	"fmt"
-	"strings"
 	"time"
 )
 
@@ -62,16 +61,9 @@ func (c *Client) BanPlayer(steamID string) (string, error) {
 
 /*
 Show information on all connected players.
-
-ISSUE: when call "ShowPlayers" command, receive correct response with i/o timeout together.
 */
 func (c *Client) ShowPlayers() (response string, err error) {
 	response, err = c.connection.sendCommand("ShowPlayers")
-
-	if strings.Contains(response, "name,playeruid,steamid") {
-		err = nil
-	}
-
 	return
 }
 
