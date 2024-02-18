@@ -21,44 +21,6 @@ const (
 	MAX_INT_32       = int32(2147483647)
 )
 
-type clientError struct {
-	message string
-}
-
-func (e *clientError) Error() string {
-	return e.message
-}
-
-type invalidPassword struct {
-}
-
-func (e *invalidPassword) Error() string {
-	return "Invalid password"
-}
-
-type connectionError struct {
-	message string
-}
-
-func (e *connectionError) Error() string {
-	return e.message
-}
-
-type commandExecutionError struct {
-	message string
-}
-
-func (e *commandExecutionError) Error() string {
-	return e.message
-}
-
-type emptyResponse struct {
-}
-
-func (e *emptyResponse) Error() string {
-	return "Empty response"
-}
-
 type littleEndianSignedInt32 int32
 
 func newLittleEndianSignedInt32(value int32) littleEndianSignedInt32 {
@@ -249,4 +211,42 @@ func (rcon *gameRCON) sendCommand(cmd string) (string, error) {
 	}
 
 	return string(responsePacket.payload), nil
+}
+
+type clientError struct {
+	message string
+}
+
+func (e *clientError) Error() string {
+	return e.message
+}
+
+type invalidPassword struct {
+}
+
+func (e *invalidPassword) Error() string {
+	return "Invalid password"
+}
+
+type connectionError struct {
+	message string
+}
+
+func (e *connectionError) Error() string {
+	return e.message
+}
+
+type commandExecutionError struct {
+	message string
+}
+
+func (e *commandExecutionError) Error() string {
+	return e.message
+}
+
+type emptyResponse struct {
+}
+
+func (e *emptyResponse) Error() string {
+	return "Empty response"
 }
