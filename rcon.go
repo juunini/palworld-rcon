@@ -23,11 +23,11 @@ const (
 
 type littleEndianSignedInt32 int32
 
-func newLittleEndianSignedInt32(value int32) littleEndianSignedInt32 {
+func newLittleEndianSignedInt32(value int32) (littleEndianSignedInt32, error) {
 	if value < MIN_INT_32 || value > MAX_INT_32 {
-		panic("Signed int32 out of bounds")
+		return 0, fmt.Errorf("value out of range: %d", value)
 	}
-	return littleEndianSignedInt32(value)
+	return littleEndianSignedInt32(value), nil
 }
 
 func (i littleEndianSignedInt32) toBytes() []byte {
@@ -65,19 +65,23 @@ func newPacket(id littleEndianSignedInt32, packetType int32, payload []byte, ter
 	}
 }
 
-func (p *packet) toBytes() []byte {
+func (p *packet) toBytes() ([]byte, error) {
 	payload := append(append(append(p.id.toBytes(), littleEndianSignedInt32(p.packetType).toBytes()...), p.payload...), p.terminator...)
-	size := newLittleEndianSignedInt32(int32(len(payload)))
-	return append(size.toBytes(), payload...)
+	size, err := newLittleEndianSignedInt32(int32(len(payload)))
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return append(size.toBytes(), payload...), nil
 }
 
 func makeCommandPacket(command string) packet {
-	id := newLittleEndianSignedInt32(randInt(0, MAX_INT_32))
+	id, _ := newLittleEndianSignedInt32(randInt(0, MAX_INT_32))
 	return newPacket(id, EXEC_COMMAND, []byte(command), []byte{0x00, 0x00})
 }
 
 func makeLoginPacket(password string) packet {
-	id := newLittleEndianSignedInt32(randInt(0, MAX_INT_32))
+	id, _ := newLittleEndianSignedInt32(randInt(0, MAX_INT_32))
 	return newPacket(id, AUTH, []byte(password), []byte{0x00, 0x00})
 }
 
@@ -158,8 +162,12 @@ func (rcon *gameRCON) sendPacket(p packet) error {
 		return &clientError{message: "Not connected."}
 	}
 
-	_, err := rcon.conn.Write(p.toBytes())
+	packetBytes, err := p.toBytes()
 	if err != nil {
+		return &clientError{message: fmt.Sprintf("Error creating packet: %s", err)}
+	}
+
+	if _, err := rcon.conn.Write(packetBytes); err != nil {
 		return &clientError{message: fmt.Sprintf("Error sending packet: %s", err)}
 	}
 
