@@ -6,7 +6,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gorcon/rcon"
 	palworldrcon "github.com/juunini/palworld-rcon"
 )
 
@@ -24,14 +23,18 @@ const EXPECTED_DO_EXIT_RESPONSE = "Shutdown..."
 const STEAMID = "00000000000000000"
 
 func setup() {
-	connection, err := rcon.Dial(fmt.Sprintf("%s:%d", HOST, PORT), ADMIN_PASSWORD)
-	if err != nil {
+	client := palworldrcon.Client{
+		Host:          HOST,
+		Port:          PORT,
+		AdminPassword: ADMIN_PASSWORD,
+	}
+	if err := client.Connect(); err != nil {
 		fmt.Println("\033[93m" + fmt.Sprintf("address: %s:%d\npassword: %s", HOST, PORT, ADMIN_PASSWORD) + "\033[0m")
 		fmt.Println("\033[91m" + "Can't connect RCON" + "\033[0m")
 		os.Exit(1)
 	}
 
-	connection.Close()
+	client.Disconnect()
 }
 
 func TestMain(m *testing.M) {
