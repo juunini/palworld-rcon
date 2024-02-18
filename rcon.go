@@ -40,14 +40,14 @@ func (i littleEndianSignedInt32) toBytes() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func littleEndianSignedInt32FromBytes(b []byte) littleEndianSignedInt32 {
+func littleEndianSignedInt32FromBytes(b []byte) (littleEndianSignedInt32, error) {
 	buf := bytes.NewReader(b)
 	var value int32
 	err := binary.Read(buf, binary.LittleEndian, &value)
 	if err != nil {
-		panic(err)
+		return 0, err
 	}
-	return littleEndianSignedInt32(value)
+	return littleEndianSignedInt32(value), nil
 }
 
 type packet struct {
@@ -198,15 +198,27 @@ func (rcon *gameRCON) readPacket() (packet, error) {
 		return packet{}, &emptyResponse{}
 	}
 
-	size := littleEndianSignedInt32FromBytes(sizeData)
+	size, err := littleEndianSignedInt32FromBytes(sizeData)
+	if err != nil {
+		return packet{}, &emptyResponse{}
+	}
+
 	packetData := make([]byte, size)
 	_, err = rcon.conn.Read(packetData)
 	if err != nil {
 		return packet{}, &emptyResponse{}
 	}
 
-	id := littleEndianSignedInt32FromBytes(packetData[:4])
-	packetType := littleEndianSignedInt32FromBytes(packetData[4:8])
+	id, err := littleEndianSignedInt32FromBytes(packetData[:4])
+	if err != nil {
+		return packet{}, &emptyResponse{}
+	}
+
+	packetType, err := littleEndianSignedInt32FromBytes(packetData[4:8])
+	if err != nil {
+		return packet{}, &emptyResponse{}
+	}
+
 	payload := packetData[8 : len(packetData)-2]
 
 	return newPacket(id, int32(packetType), payload, []byte{0x00, 0x00}), nil
