@@ -30,13 +30,14 @@ func newLittleEndianSignedInt32(value int32) (littleEndianSignedInt32, error) {
 	return littleEndianSignedInt32(value), nil
 }
 
-func (i littleEndianSignedInt32) toBytes() []byte {
+func (i littleEndianSignedInt32) toBytes() ([]byte, error) {
 	buf := new(bytes.Buffer)
 	err := binary.Write(buf, binary.LittleEndian, i)
 	if err != nil {
-		panic(err)
+		return []byte{}, err
 	}
-	return buf.Bytes()
+
+	return buf.Bytes(), nil
 }
 
 func littleEndianSignedInt32FromBytes(b []byte) littleEndianSignedInt32 {
@@ -66,13 +67,29 @@ func newPacket(id littleEndianSignedInt32, packetType int32, payload []byte, ter
 }
 
 func (p *packet) toBytes() ([]byte, error) {
-	payload := append(append(append(p.id.toBytes(), littleEndianSignedInt32(p.packetType).toBytes()...), p.payload...), p.terminator...)
+	packetIDBytes, err := p.id.toBytes()
+	if err != nil {
+		return []byte{}, err
+	}
+
+	int32PacketType, _ := newLittleEndianSignedInt32(p.packetType)
+	packetTypeBytes, err := int32PacketType.toBytes()
+	if err != nil {
+		return []byte{}, err
+	}
+
+	payload := append(append(append(packetIDBytes, packetTypeBytes...), p.payload...), p.terminator...)
 	size, err := newLittleEndianSignedInt32(int32(len(payload)))
 	if err != nil {
 		return []byte{}, err
 	}
 
-	return append(size.toBytes(), payload...), nil
+	sizeBytes, err := size.toBytes()
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return append(sizeBytes, payload...), nil
 }
 
 func makeCommandPacket(command string) packet {
