@@ -10,12 +10,18 @@ type Client struct {
 	Host          string
 	Port          uint
 	AdminPassword string
+	// Default is 15 seconds.
+	Timeout time.Duration
 
 	connection *gameRCON
 }
 
 func (c *Client) Connect() error {
-	c.connection = newGameRCON(c.Host, int(c.Port), c.AdminPassword, 15*time.Second)
+	if c.Timeout == 0 {
+		c.Timeout = 15 * time.Second
+	}
+
+	c.connection = newGameRCON(c.Host, int(c.Port), c.AdminPassword, c.Timeout)
 	return c.connection.connect()
 }
 
