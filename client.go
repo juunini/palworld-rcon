@@ -7,7 +7,7 @@ import (
 
 type Client struct {
 	Host          string
-	Port          uint
+	Port          int
 	AdminPassword string
 	// Default is 15 seconds.
 	Timeout time.Duration
@@ -35,7 +35,7 @@ If <seconds> is specified, the server will shut down after the specified time ha
 
 The server participant will be notified of what you have entered in <message>.
 */
-func (c *Client) Shutdown(seconds uint, message string) (string, error) {
+func (c *Client) Shutdown(seconds int, message string) (string, error) {
 	return c.connection.sendCommand(fmt.Sprintf("Shutdown %d %s", seconds, message))
 }
 
