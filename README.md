@@ -27,20 +27,14 @@ package main
 
 import (
     "fmt"
-    // "time"
+    "time"
 
     palworldrcon "github.com/juunini/palworld-rcon"
 )
 
 func main() {
-    client := palworldrcon.Client{
-        Host: "127.0.0.1",
-        Port: 25575,
-        AdminPassword: "your admin password",
-        // Timeout: 15 * time.Second, (optional)
-    }
-
-    if err := client.Connect(); err != nil {
+    client, err := palworldrcon.Connect("127.0.0.1", 25575, "your admin password", 15 * time.Second)
+    if err != nil {
         panic(err)
     }
 

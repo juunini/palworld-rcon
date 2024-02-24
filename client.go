@@ -15,6 +15,22 @@ type Client struct {
 	connection *gameRCON
 }
 
+func Connect(host string, port int, adminPassword string, timeout time.Duration) (*Client, error) {
+	client := &Client{
+		Host:          host,
+		Port:          port,
+		AdminPassword: adminPassword,
+		Timeout:       timeout,
+	}
+
+	err := client.Connect()
+	if err != nil {
+		return nil, err
+	}
+
+	return client, nil
+}
+
 func (c *Client) Connect() error {
 	if c.Timeout == 0 {
 		c.Timeout = 15 * time.Second
